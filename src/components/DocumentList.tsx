@@ -1,22 +1,33 @@
-
 import { useState } from 'react';
 import { Document } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, FileText, ExternalLink, Search } from 'lucide-react';
+import { Loader2, FileText, ExternalLink, Search, Trash2, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface DocumentListProps {
   documents: Document[];
   isLoading?: boolean;
   onCreateNew: () => void;
+  onDeleteDocument?: (documentId: string) => void;
 }
 
-export function DocumentList({ documents, isLoading = false, onCreateNew }: DocumentListProps) {
+export function DocumentList({ documents, isLoading = false, onCreateNew, onDeleteDocument }: DocumentListProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
   
   // Filter documents by search query
@@ -27,6 +38,24 @@ export function DocumentList({ documents, isLoading = false, onCreateNew }: Docu
   // Navigate to document details
   const handleViewDocument = (documentId: string) => {
     navigate(`/documents/${documentId}`);
+  };
+  
+  // Handle delete confirmation
+  const handleDeleteClick = (documentId: string) => {
+    setDocumentToDelete(documentId);
+  };
+  
+  // Handle confirmed delete
+  const handleConfirmDelete = () => {
+    if (documentToDelete && onDeleteDocument) {
+      onDeleteDocument(documentToDelete);
+      setDocumentToDelete(null);
+    }
+  };
+  
+  // Handle cancel delete
+  const handleCancelDelete = () => {
+    setDocumentToDelete(null);
   };
   
   // Status badge component
@@ -58,6 +87,30 @@ export function DocumentList({ documents, isLoading = false, onCreateNew }: Docu
 
   return (
     <div className="w-full max-w-5xl mx-auto">
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={documentToDelete !== null} onOpenChange={(open) => !open && setDocumentToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              Confirm Document Deletion
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this document? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDelete}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h2 className="text-3xl font-semibold tracking-tight">Your Documents</h2>
@@ -127,15 +180,25 @@ export function DocumentList({ documents, isLoading = false, onCreateNew }: Docu
                 </p>
               </CardContent>
               <CardFooter className="justify-between border-t pt-4 pb-2">
-                <Button
-                  variant="outline" 
-                  onClick={() => handleViewDocument(doc.id)}
-                  disabled={doc.status === 'processing'}
-                  className="gap-1.5"
-                >
-                  <FileText size={16} />
-                  View
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline" 
+                    onClick={() => handleViewDocument(doc.id)}
+                    disabled={doc.status === 'processing'}
+                    className="gap-1.5"
+                  >
+                    <FileText size={16} />
+                    View
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDeleteClick(doc.id)}
+                    className="gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </Button>
+                </div>
                 <Button
                   variant="ghost" 
                   size="icon"

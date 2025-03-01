@@ -1,4 +1,4 @@
-# Guided Vision Documentation Platform
+# How2 Documentation Platform
 
 An AI-powered documentation tool that converts screen recordings (with voice explanations) into structured process documentation. Useful for creating step-by-step guides for internal procedures or user-facing instructions.
 

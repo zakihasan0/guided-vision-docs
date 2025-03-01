@@ -1,0 +1,23 @@
+{
+  "title": "How to Perform a Screen Recording Test",
+  "introduction": "This tutorial demonstrates how to conduct a screen recording test, including starting the recording and highlighting key moments during the process. This is important for documenting processes, creating tutorials, or troubleshooting issues.",
+  "steps": [
+    {
+      "title": "Start Screen Recording",
+      "description": "At 0.5 seconds, initiate the screen recording. Ensure your screen recording software is properly configured and ready to capture the desired content.  Select the appropriate recording area and audio input settings."
+    },
+    {
+      "title": "Key Moment at 1 Second",
+      "description": "At 1.4438886666666668 seconds (approximately 1 second), perform the first key action or demonstrate the specific feature you are testing.  Make sure to clearly show the steps and explain what is happening on the screen."
+    },
+    {
+      "title": "Mentioning Previous Attempt",
+      "description": "At 2 seconds, briefly mention any previous recording attempts, especially if there were issues or reasons for restarting.  This provides context and helps viewers understand the process. This specific tutorial mentions a previous deleted attempt."
+    },
+    {
+      "title": "Key Moment at 3 Seconds",
+      "description": "At 2.8877773333333336 seconds (approximately 3 seconds), perform the next key action or step in the process. Provide clear explanations and highlight any important details. Similar to the key moment at 1 second, ensure clear demonstration and narration."
+    }
+  ],
+  "conclusion": "This tutorial demonstrated the basic steps of performing a screen recording test, including starting the recording, highlighting key moments, and mentioning prior attempts. Remember to review the recorded footage after completion and make any necessary edits before sharing. For further assistance, consult your screen recording software documentation for advanced features and troubleshooting."
+}

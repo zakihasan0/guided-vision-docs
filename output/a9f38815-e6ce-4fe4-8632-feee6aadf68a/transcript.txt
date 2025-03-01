@@ -1,0 +1,1 @@
+This is how to train the predictive model from the insurance data set. First, go to your email. Second, download the insurance data. Third, copy the code. Fourth, go to RStudio. Fifth, drag the insurance data file into RStudio. Sixth, click insurance data. Seventh, click import data set. Eighth, copy the code and paste it. Ninth, you will see your predicted model.

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { DocumentList } from '@/components/DocumentList';
@@ -197,15 +196,24 @@ const Index = () => {
     setIsRecordingModalOpen(true);
   };
 
+  // Handle document deletion
+  const handleDeleteDocument = (documentId: string) => {
+    // Remove the document from state
+    setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+    
+    // Show success toast
+    toast.success('Document deleted successfully');
+  };
+
   return (
-    <div className="container py-10">
+    <div className="container py-6">
       <div className="flex flex-col gap-12">
         <section className="text-center max-w-3xl mx-auto">
           <div className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full mb-4 animate-fade-in">
             <span className="text-sm font-medium tracking-wide">Documentation Simplified</span>
           </div>
           <h1 className="text-5xl sm:text-6xl font-bold mb-6 tracking-tight animate-slide-down">
-            Guided Vision
+            How2
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in">
             Transform your screen recordings into detailed step-by-step documentation, 
@@ -234,6 +242,7 @@ const Index = () => {
             documents={documents} 
             isLoading={isLoading} 
             onCreateNew={handleCreateNewDocument}
+            onDeleteDocument={handleDeleteDocument}
           />
         </section>
       </div>

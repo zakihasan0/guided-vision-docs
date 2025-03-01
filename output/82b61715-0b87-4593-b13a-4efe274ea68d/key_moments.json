@@ -1,0 +1,34 @@
+[
+  {
+    "time": 5,
+    "text": "Accessing the email containing the insurance data set"
+  },
+  {
+    "time": 15,
+    "text": "Downloading the insurance data set from the email"
+  },
+  {
+    "time": 25,
+    "text": "Copying the provided R code for model training"
+  },
+  {
+    "time": 35,
+    "text": "Opening RStudio and navigating to the project"
+  },
+  {
+    "time": 45,
+    "text": "Dragging and dropping the downloaded data into the RStudio project folder"
+  },
+  {
+    "time": 52,
+    "text": "Importing the insurance data set into RStudio"
+  },
+  {
+    "time": 57,
+    "text": "Pasting the copied R code into the RStudio console/script"
+  },
+  {
+    "time": 61,
+    "text": "Running the R code to train the predictive model"
+  }
+]

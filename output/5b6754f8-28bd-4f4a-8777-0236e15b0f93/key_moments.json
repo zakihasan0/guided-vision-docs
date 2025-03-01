@@ -1,0 +1,22 @@
+[
+  {
+    "time": 5,
+    "text": "Downloading the insurance data from email."
+  },
+  {
+    "time": 15,
+    "text": "Importing the insurance data into RStudio."
+  },
+  {
+    "time": 25,
+    "text": "Opening the insurance data within RStudio and initiating the import process."
+  },
+  {
+    "time": 35,
+    "text": "Pasting the provided code into the RStudio console."
+  },
+  {
+    "time": 45,
+    "text": "Running the code and observing the trained predictive model."
+  }
+]

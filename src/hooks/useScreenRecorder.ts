@@ -500,6 +500,44 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
         }
       }
       
+      // Stop all media tracks
+      if (screenStreamRef.current) {
+        screenStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log("Screen track stopped:", track.kind, track.label);
+        });
+      }
+      
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log("Camera track stopped:", track.kind, track.label);
+        });
+      }
+      
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log("Audio track stopped:", track.kind, track.label);
+        });
+      }
+      
+      if (canvasStreamRef.current) {
+        canvasStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log("Canvas track stopped:", track.kind, track.label);
+        });
+      }
+
+      // Clear video source objects
+      if (videoScreenRef.current) {
+        videoScreenRef.current.srcObject = null;
+      }
+      
+      if (videoCameraRef.current) {
+        videoCameraRef.current.srcObject = null;
+      }
+      
       // Update state
       setIsRecording(false);
     } catch (error) {

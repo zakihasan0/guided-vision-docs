@@ -108,7 +108,7 @@ app.use('/uploads', express.static(uploadsDir));
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('Guided Vision API is running');
+  res.send('How2 API is running');
 });
 
 // Upload and process recording
@@ -610,5 +610,5 @@ async function transcribeAudio(audioPath) {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Guided Vision API server running on port ${port}`);
+  console.log(`How2 API server running on port ${port}`);
 }); 

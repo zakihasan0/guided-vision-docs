@@ -1,0 +1,34 @@
+[
+  {
+    "time": 5,
+    "text": "Go to your email inbox"
+  },
+  {
+    "time": 12,
+    "text": "Download the insurance dataset"
+  },
+  {
+    "time": 19,
+    "text": "Copy the provided code"
+  },
+  {
+    "time": 26,
+    "text": "Open R Studio"
+  },
+  {
+    "time": 33,
+    "text": "Drag the insurance data file into R Studio"
+  },
+  {
+    "time": 38,
+    "text": "Click 'Import Dataset'"
+  },
+  {
+    "time": 42,
+    "text": "Click 'Import'"
+  },
+  {
+    "time": 46,
+    "text": "Paste the code and click 'Enter' to train the model"
+  }
+]

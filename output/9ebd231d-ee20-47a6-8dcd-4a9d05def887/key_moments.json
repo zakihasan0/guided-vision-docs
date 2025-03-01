@@ -1,0 +1,34 @@
+[
+  {
+    "time": 929785.156375,
+    "text": "Accessing the email with the dataset link"
+  },
+  {
+    "time": 1859570.31275,
+    "text": "Downloading the insurance dataset"
+  },
+  {
+    "time": 2789355.469125,
+    "text": "Copying the provided R code"
+  },
+  {
+    "time": 3719140.6255,
+    "text": "Opening RStudio and navigating to the project folder"
+  },
+  {
+    "time": 4648925.781875,
+    "text": "Dragging and dropping the insurance data into the R project"
+  },
+  {
+    "time": 5578710.93825,
+    "text": "Importing the dataset within RStudio"
+  },
+  {
+    "time": 6508496.094625,
+    "text": "Pasting and running the R code in the console"
+  },
+  {
+    "time": 7023333.671,
+    "text": "Viewing the trained predictive model output"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "time": 0.5,
+    "text": "Start of recording: Potential brief visual of the desktop or initial application."
+  },
+  {
+    "time": 1.5,
+    "text": "Verbal confirmation \"Testing again.\" likely audible."
+  },
+  {
+    "time": 2.5,
+    "text": "Potential demonstration of a basic mouse movement or window interaction to test recording functionality."
+  },
+  {
+    "time": 3,
+    "text": "Likely preparing to end the recording or performing a final test action."
+  }
+]
