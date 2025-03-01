@@ -285,8 +285,11 @@ app.post('/api/process-recording', upload.single('recording'), async (req, res) 
         // Convert relative URLs to absolute paths for image analysis
         const absoluteImagePaths = frameUrls.map(url => {
           if (url.startsWith('/')) {
-            // Remove leading / and join with the server directory
-            return path.join(process.cwd(), url.substring(1));
+            // Extract the path after /output/ and join with the process.cwd() and 'output'
+            const relativePath = url.substring('/output/'.length);
+            const absolutePath = path.join(process.cwd(), 'output', relativePath);
+            console.log(`Converting URL ${url} to absolute path: ${absolutePath}`);
+            return absolutePath;
           }
           return url;
         });
@@ -294,7 +297,14 @@ app.post('/api/process-recording', upload.single('recording'), async (req, res) 
         console.log('Image paths for analysis:', absoluteImagePaths);
         
         // Ensure all paths exist
-        const validPaths = absoluteImagePaths.filter(path => fs.existsSync(path));
+        const validPaths = absoluteImagePaths.filter(imagePath => {
+          const exists = fs.existsSync(imagePath);
+          if (!exists) {
+            console.warn(`Image path does not exist: ${imagePath}`);
+          }
+          return exists;
+        });
+        
         console.log(`Found ${validPaths.length} valid image paths out of ${absoluteImagePaths.length}`);
         
         if (validPaths.length > 0) {
@@ -513,6 +523,10 @@ async function extractFramesAtKeyMoments(videoPath, outputDir, keyMoments) {
     // Extract frames at key moments
     console.log(`Extracting frames at ${keyMoments.length} key moments`);
     
+    // Get the job ID from the output directory path
+    const jobId = path.basename(path.dirname(outputDir));
+    console.log(`Job ID extracted from path: ${jobId}`);
+    
     for (let i = 0; i < keyMoments.length; i++) {
       const moment = keyMoments[i];
       const timestamp = moment.time;
@@ -547,8 +561,8 @@ async function extractFramesAtKeyMoments(videoPath, outputDir, keyMoments) {
         if (fs.existsSync(framePath) && fs.statSync(framePath).size > 0) {
           console.log(`Frame file exists: ${framePath}, size: ${fs.statSync(framePath).size} bytes`);
           
-          // Create URL path for the client
-          const frameUrl = `/output/${path.basename(path.dirname(framePath))}/frames/${frameFileName}`;
+          // Create URL path for the client - fix the path to correctly include the job ID
+          const frameUrl = `/output/${jobId}/frames/${frameFileName}`;
           console.log(`Created URL for frame: ${frameUrl}`);
           
           frameUrls.push(frameUrl);

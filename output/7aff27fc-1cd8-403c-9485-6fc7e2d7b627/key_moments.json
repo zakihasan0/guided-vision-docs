@@ -1,0 +1,26 @@
+[
+  {
+    "time": 1.5,
+    "text": "Introduction to Safari tabs and the purpose of the tutorial"
+  },
+  {
+    "time": 3,
+    "text": "Demonstrating switching tabs by clicking on the tab bar at the top"
+  },
+  {
+    "time": 4.5,
+    "text": "Using keyboard shortcuts (Command + Shift + Left/Right arrow) to navigate between tabs"
+  },
+  {
+    "time": 6,
+    "text": "Showing how to create a new tab (Command + T)"
+  },
+  {
+    "time": 7.5,
+    "text": "Explaining how to close a tab (Command + W or clicking the 'x' on the tab)"
+  },
+  {
+    "time": 9,
+    "text": "Recap of the demonstrated methods and concluding the tutorial"
+  }
+]
