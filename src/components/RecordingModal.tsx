@@ -20,7 +20,8 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
     startRecording, 
     stopRecording, 
     recordedBlob, 
-    error 
+    error,
+    recordingPreview 
   } = useScreenRecorder();
   
   const [recordingOptions, setRecordingOptions] = useState<RecordingOptions>({
@@ -59,25 +60,11 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
   
   // Handle recorded blob changes
   useEffect(() => {
-    // Clean up previous blob URL
-    if (blobUrlRef.current) {
-      URL.revokeObjectURL(blobUrlRef.current);
-      blobUrlRef.current = null;
+    if (recordingPreview && !isRecording && videoRef.current) {
+      console.log("Setting video src to", recordingPreview);
+      videoRef.current.src = recordingPreview;
     }
-    
-    if (recordedBlob && !isRecording) {
-      console.log("Recording completed with blob size:", recordedBlob.size);
-      
-      // Create a new blob URL for the video preview
-      const blobUrl = URL.createObjectURL(recordedBlob);
-      blobUrlRef.current = blobUrl;
-      
-      // Update the video element if it exists
-      if (videoRef.current) {
-        videoRef.current.src = blobUrl;
-      }
-    }
-  }, [recordedBlob, isRecording]);
+  }, [recordingPreview, isRecording]);
   
   // Handle errors
   useEffect(() => {
@@ -108,38 +95,32 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
       console.log("Processing recording, mime type:", recordedBlob.type);
       console.log("Blob size:", recordedBlob.size);
       
-      // Simulate processing delay
-      setTimeout(() => {
-        try {
-          console.log("Processing recording, sending to parent component");
-          onRecordingComplete(recordedBlob);
-          setIsProcessing(false);
-          onClose();
-          toast.success("Recording processed successfully");
-        } catch (e) {
-          console.error("Error processing recording:", e);
-          setIsProcessing(false);
-          toast.error("Failed to process recording. Please try again.");
-        }
-      }, 2000);
+      // Process the recording
+      try {
+        console.log("Processing recording, sending to parent component");
+        onRecordingComplete(recordedBlob);
+        setIsProcessing(false);
+        onClose();
+        toast.success("Recording processed successfully. Processing for AI analysis...");
+      } catch (e) {
+        console.error("Error processing recording:", e);
+        setIsProcessing(false);
+        toast.error("Failed to process recording. Please try again.");
+      }
     }
   }, [recordedBlob, onRecordingComplete, onClose]);
   
   // Handle recording options change
   const toggleOption = useCallback((option: keyof RecordingOptions) => {
     setRecordingOptions(prev => {
-      // If turning off screen capture, enable video
-      if (option === 'screen' && prev.screen) {
-        return { ...prev, [option]: !prev[option], video: true };
+      const newOptions = { ...prev, [option]: !prev[option] };
+      
+      // Make sure at least one option is enabled
+      if (!newOptions.audio && !newOptions.video && !newOptions.screen) {
+        return prev; // Don't allow all options to be disabled
       }
       
-      // If turning off video and screen is off, enable screen
-      if (option === 'video' && prev.video && !prev.screen) {
-        return { ...prev, [option]: !prev[option], screen: true };
-      }
-      
-      // Otherwise just toggle the option
-      return { ...prev, [option]: !prev[option] };
+      return newOptions;
     });
   }, []);
   
@@ -179,7 +160,7 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
             ) : recordedBlob ? (
               "Recording completed"
             ) : (
-              "Record your screen"
+              "Record your process"
             )}
           </DialogTitle>
           <DialogDescription>
@@ -258,7 +239,6 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
                 className="w-full h-auto"
                 autoPlay={false}
               >
-                <source src={blobUrlRef.current || undefined} type={recordedBlob.type || 'video/webm'} />
                 Your browser does not support the video tag.
               </video>
             </div>

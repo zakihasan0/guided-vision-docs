@@ -5,6 +5,7 @@ import { DocumentList } from '@/components/DocumentList';
 import { RecordingModal } from '@/components/RecordingModal';
 import { Document } from '@/lib/types';
 import { toast } from 'sonner';
+import { processRecording } from '@/services/processingService';
 
 const Index = () => {
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
@@ -12,11 +13,33 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const isProcessingRecording = useRef(false);
 
-  // Simulated data loading
+  // Load documents from localStorage or use mock data
   useEffect(() => {
     const loadDocs = async () => {
       setIsLoading(true);
-      // In a real app, this would be an API call
+      
+      // Try to load documents from localStorage first
+      const storedDocsString = localStorage.getItem('documents');
+      if (storedDocsString) {
+        try {
+          const storedDocs = JSON.parse(storedDocsString);
+          if (Array.isArray(storedDocs) && storedDocs.length > 0) {
+            // Convert date strings back to Date objects
+            const parsedDocs = storedDocs.map(doc => ({
+              ...doc,
+              createdAt: new Date(doc.createdAt)
+            }));
+            
+            setDocuments(parsedDocs);
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to parse stored documents:", e);
+        }
+      }
+      
+      // If no localStorage data or parsing failed, use mock data
       setTimeout(() => {
         const mockDocs: Document[] = [
           {
@@ -112,15 +135,24 @@ const Index = () => {
         ];
         
         setDocuments(mockDocs);
+        // Save mock docs to localStorage too
+        localStorage.setItem('documents', JSON.stringify(mockDocs));
         setIsLoading(false);
       }, 1500);
     };
     
     loadDocs();
   }, []);
+  
+  // Save documents to localStorage whenever they change
+  useEffect(() => {
+    if (!isLoading && documents.length > 0) {
+      localStorage.setItem('documents', JSON.stringify(documents));
+    }
+  }, [documents, isLoading]);
 
   // Handle recording completion
-  const handleRecordingComplete = (blob: Blob) => {
+  const handleRecordingComplete = async (blob: Blob) => {
     console.log('Recording completed, blob size:', blob.size);
     
     // Prevent multiple document creations
@@ -132,60 +164,30 @@ const Index = () => {
     isProcessingRecording.current = true;
     
     try {
-      // This would normally upload the recording to a server
-      // For demo purposes, we'll simulate processing and adding a new document
-      
-      const newDoc: Document = {
+      // Create a placeholder document while processing
+      const placeholderDoc: Document = {
         id: `doc-${Date.now()}`,
         title: `Processing Document...`,
         createdAt: new Date(),
         status: 'processing'
       };
       
-      setDocuments(prev => [newDoc, ...prev]);
+      // Add the placeholder document to the list
+      setDocuments(prev => [placeholderDoc, ...prev]);
       
-      // Simulate processing completion
-      setTimeout(() => {
-        setDocuments(prev => prev.map(doc => 
-          doc.id === newDoc.id 
-            ? {
-              ...doc,
-              status: 'completed',
-              title: `How to Configure System Settings`,
-              content: {
-                introduction: 'This guide covers the system configuration process for administrators to optimize performance and security.',
-                steps: [
-                  {
-                    id: `step-${Date.now()}-1`,
-                    title: 'Access System Settings',
-                    description: 'Navigate to the Administration panel and select "System Settings" from the dropdown menu.',
-                    imageUrl: 'https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?q=80&w=1000&auto=format&fit=crop'
-                  },
-                  {
-                    id: `step-${Date.now()}-2`,
-                    title: 'Update Security Parameters',
-                    description: 'Locate the Security tab and review all current settings. Adjust password policies and access controls as needed for compliance.',
-                    imageUrl: 'https://images.unsplash.com/photo-1563206767-5b18f218e8de?q=80&w=1000&auto=format&fit=crop'
-                  },
-                  {
-                    id: `step-${Date.now()}-3`,
-                    title: 'Configure Performance Options',
-                    description: 'Navigate to the Performance section and optimize cache settings and database connection parameters based on system load.',
-                    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop'
-                  }
-                ],
-                conclusion: 'After completing these configurations, run the system diagnostics tool to verify all settings are applied correctly and monitor performance for 24 hours.'
-              }
-            } 
-            : doc
-        ));
-        
-        toast.success('Document processing completed');
-        isProcessingRecording.current = false;
-      }, 8000);
+      // Process the recording with our AI workflow
+      const processedDoc = await processRecording(blob);
+      
+      // Update the document with the processed result
+      setDocuments(prev => prev.map(doc => 
+        doc.id === placeholderDoc.id ? processedDoc : doc
+      ));
+      
+      toast.success('Documentation generated successfully!');
+      isProcessingRecording.current = false;
     } catch (error) {
       console.error("Error processing recording:", error);
-      toast.error("Failed to process recording");
+      toast.error("Failed to process recording. Please try again.");
       isProcessingRecording.current = false;
     }
   };

@@ -14,8 +14,6 @@ const DocumentDetail = () => {
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    console.log("DocumentDetail: Fetching document with ID:", id);
-    
     // In a real app, fetch the document from an API
     const fetchDocument = async () => {
       setIsLoading(true);
@@ -119,44 +117,26 @@ const DocumentDetail = () => {
           }
         };
         
-        // Handling for dynamically created docs
-        if (id && id.startsWith('doc-')) {
-          // Create a dynamic document for any doc-* ID to prevent "document not found" errors
-          const dynamicDoc: Document = {
-            id: id,
-            title: 'How to Configure System Settings',
-            createdAt: new Date(Date.now() - 3600000 * 1), // 1 hour ago
-            status: 'completed',
-            content: {
-              introduction: 'This guide covers the system configuration process for administrators to optimize performance and security.',
-              steps: [
-                {
-                  id: 'dyn-1',
-                  title: 'Access System Settings',
-                  description: 'Navigate to the Administration panel and select "System Settings" from the dropdown menu.',
-                  imageUrl: 'https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?q=80&w=1000&auto=format&fit=crop'
-                },
-                {
-                  id: 'dyn-2',
-                  title: 'Update Security Parameters',
-                  description: 'Locate the Security tab and review all current settings. Adjust password policies and access controls as needed for compliance.',
-                  imageUrl: 'https://images.unsplash.com/photo-1563206767-5b18f218e8de?q=80&w=1000&auto=format&fit=crop'
-                },
-                {
-                  id: 'dyn-3',
-                  title: 'Configure Performance Options',
-                  description: 'Navigate to the Performance section and optimize cache settings and database connection parameters based on system load.',
-                  imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop'
+        // Add dynamic documents - this will make newly created docs accessible too
+        const storedDocsString = localStorage.getItem('documents');
+        if (storedDocsString) {
+          try {
+            const storedDocs = JSON.parse(storedDocsString);
+            if (Array.isArray(storedDocs)) {
+              storedDocs.forEach(doc => {
+                if (doc && doc.id) {
+                  mockDocs[doc.id] = doc;
                 }
-              ],
-              conclusion: 'After completing these configurations, run the system diagnostics tool to verify all settings are applied correctly and monitor performance for 24 hours.'
+              });
             }
-          };
-          setDocument(dynamicDoc);
-        } else if (id && mockDocs[id]) {
+          } catch (e) {
+            console.error("Failed to parse stored documents:", e);
+          }
+        }
+        
+        if (id && mockDocs[id]) {
           setDocument(mockDocs[id]);
         } else {
-          console.error('Document not found with ID:', id);
           setError('Document not found');
         }
       } catch (err) {
