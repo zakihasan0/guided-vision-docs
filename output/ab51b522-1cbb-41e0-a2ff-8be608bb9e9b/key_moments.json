@@ -1,0 +1,18 @@
+[
+  {
+    "time": 0.5,
+    "text": "Instruction to take a screen capture is given."
+  },
+  {
+    "time": 2,
+    "text": "User is likely initiating the screen capture process (depending on the specific method used)."
+  },
+  {
+    "time": 3.5,
+    "text": "Screen capture is in progress/being finalized."
+  },
+  {
+    "time": 5,
+    "text": "Screen capture process completes."
+  }
+]

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useScreenRecorder } from '@/hooks/useScreenRecorder';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -35,12 +34,59 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
   const videoRef = useRef<HTMLVideoElement>(null);
   const blobUrlRef = useRef<string | null>(null);
   
+  // Camera preview elements
+  const cameraPreviewRef = useRef<HTMLVideoElement>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
+  
   // Format recording time as MM:SS
   const formattedTime = useCallback(() => {
     const minutes = Math.floor(recordingTime / 60);
     const seconds = recordingTime % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }, [recordingTime]);
+  
+  // Initialize camera preview when video option is enabled
+  useEffect(() => {
+    const setupCameraPreview = async () => {
+      // Clean up any existing camera stream
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(track => track.stop());
+        cameraStreamRef.current = null;
+      }
+      
+      // If video is enabled and we're not recording, set up camera preview
+      if (recordingOptions.video && !isRecording && !recordedBlob && cameraPreviewRef.current) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 320 },
+              height: { ideal: 240 },
+              facingMode: "user" // Front camera
+            },
+            audio: false
+          });
+          
+          cameraPreviewRef.current.srcObject = stream;
+          cameraStreamRef.current = stream;
+        } catch (e) {
+          console.error("Failed to initialize camera preview:", e);
+          toast.error("Could not access camera. Please check permissions.");
+        }
+      }
+    };
+    
+    if (isOpen) {
+      setupCameraPreview();
+    }
+    
+    // Clean up camera stream when component unmounts or options change
+    return () => {
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(track => track.stop());
+        cameraStreamRef.current = null;
+      }
+    };
+  }, [recordingOptions.video, isRecording, recordedBlob, isOpen]);
   
   // Reset state when modal closes
   useEffect(() => {
@@ -54,6 +100,12 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
       if (blobUrlRef.current) {
         URL.revokeObjectURL(blobUrlRef.current);
         blobUrlRef.current = null;
+      }
+      
+      // Clean up camera preview
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(track => track.stop());
+        cameraStreamRef.current = null;
       }
     }
   }, [isOpen, isRecording, stopRecording]);
@@ -128,6 +180,13 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
   const handleStartRecording = useCallback(async () => {
     console.log("Starting recording with options:", recordingOptions);
     setHasStartedRecording(true);
+    
+    // Clean up camera preview before starting recording
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current.getTracks().forEach(track => track.stop());
+      cameraStreamRef.current = null;
+    }
+    
     await startRecording(recordingOptions);
   }, [startRecording, recordingOptions]);
 
@@ -210,6 +269,22 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
                 </Button>
               </div>
               
+              {/* Camera preview */}
+              {recordingOptions.video && (
+                <div className="relative overflow-hidden rounded-lg border bg-muted/30 aspect-video">
+                  <video 
+                    ref={cameraPreviewRef}
+                    autoPlay 
+                    muted 
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-2 right-2 text-xs bg-black/70 text-white px-2 py-1 rounded">
+                    Camera Preview
+                  </div>
+                </div>
+              )}
+              
               <div className="p-4 bg-secondary rounded-md text-sm text-muted-foreground">
                 <p className="font-medium mb-2">Tips for better documentation:</p>
                 <ul className="list-disc pl-5 space-y-1">
@@ -248,40 +323,40 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
         <DialogFooter className="flex sm:justify-between items-center">
           {!isRecording && !recordedBlob ? (
             <>
-              <Button variant="outline" onClick={handleClose} className="sm:mr-auto">
+              <Button variant="ghost" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button 
-                onClick={handleStartRecording} 
-                disabled={!recordingOptions.audio && !recordingOptions.video && !recordingOptions.screen}
-                className="gap-2"
-              >
+              <Button onClick={handleStartRecording} className="gap-2">
                 Start Recording
               </Button>
             </>
           ) : isRecording ? (
             <Button 
+              variant="destructive" 
               onClick={stopRecording} 
-              variant="destructive"
-              className="ml-auto gap-2"
+              className="w-full gap-2"
             >
-              <Clock size={16} />
+              <X size={16} />
               Stop Recording
             </Button>
           ) : (
             <>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleClose} disabled={isProcessing}>
-                  <X size={16} className="mr-2" />
-                  Cancel
-                </Button>
-                <Button variant="outline" onClick={handleRecordAgain} disabled={isProcessing}>
-                  Record Again
-                </Button>
-              </div>
-              <Button onClick={handleSaveRecording} disabled={isProcessing} className="gap-2">
-                {isProcessing && <Loader2 size={16} className="animate-spin" />}
-                {isProcessing ? "Processing..." : "Generate Documentation"}
+              <Button variant="outline" onClick={handleRecordAgain}>
+                Record Again
+              </Button>
+              <Button 
+                onClick={handleSaveRecording} 
+                disabled={isProcessing}
+                className="gap-2"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Generate Documentation"
+                )}
               </Button>
             </>
           )}

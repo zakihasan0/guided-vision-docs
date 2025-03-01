@@ -1,69 +1,110 @@
-# Welcome to your Lovable project
+# Guided Vision Documentation Platform
 
-## Project info
+An AI-powered documentation tool that converts screen recordings (with voice explanations) into structured process documentation. Useful for creating step-by-step guides for internal procedures or user-facing instructions.
 
-**URL**: https://lovable.dev/projects/b647e7c1-4a2a-4fd0-9d42-c8baf878fca2
+## Features
 
-## How can I edit this code?
+- **Screen Recording**: Capture screen, webcam, and audio in one shot
+- **Automated Transcription**: Transcribes audio to text using AI
+- **AI-Powered Formatting**: Transforms raw text into a step-by-step guide
+- **Screenshot Extraction**: Grabs relevant frames from the video to embed as illustrations
+- **Simple Web UI**: Upload recordings, generate docs, and view/share them
 
-There are several ways of editing your application.
+## Technical Architecture
 
-**Use Lovable**
+### Frontend
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b647e7c1-4a2a-4fd0-9d42-c8baf878fca2) and start prompting.
+- React with TypeScript
+- Shadcn UI components
+- MediaRecorder API for screen/camera/audio capture
+- Axios for API communication
 
-Changes made via Lovable will be committed automatically to this repo.
+### Backend
 
-**Use your preferred IDE**
+- Node.js with Express
+- FFmpeg for audio extraction and frame capture
+- OpenAI APIs (Whisper for transcription, GPT for document generation)
+- Multer for file uploads
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
 
-Follow these steps:
+- Node.js (v16+)
+- npm or yarn
+- FFmpeg installed on your system (for backend processing)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/guided-vision-docs.git
+   cd guided-vision-docs
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+3. Set up environment variables:
+   Create a `.env` file in the root directory with the following variables:
+   ```
+   OPENAI_API_KEY=your_openai_api_key
+   ```
 
-**Edit a file directly in GitHub**
+### Running the Application
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. Start the development server and backend:
+   ```
+   npm run dev:full
+   ```
 
-**Use GitHub Codespaces**
+2. Open your browser and navigate to:
+   ```
+   http://localhost:5173
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Usage
 
-## What technologies are used for this project?
+1. Click "Record New Process" to start a new recording
+2. Select which inputs to record (screen, camera, microphone)
+3. Click "Start Recording" and perform the process you want to document
+4. Narrate your actions clearly as you perform them
+5. Click "Stop Recording" when finished
+6. Preview your recording and click "Generate Documentation"
+7. The system will process your recording and generate a structured document
+8. View and share your documentation from the main dashboard
 
-This project is built with .
+## Development Workflow
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Frontend
 
-## How can I deploy this project?
+The frontend is built with React and uses the following key components:
 
-Simply open [Lovable](https://lovable.dev/projects/b647e7c1-4a2a-4fd0-9d42-c8baf878fca2) and click on Share -> Publish.
+- `RecordingModal.tsx`: Handles the recording UI and options
+- `useScreenRecorder.ts`: Custom hook for managing media recording
+- `processingService.ts`: Service for sending recordings to the backend
+- `DocumentViewer.tsx`: Displays the generated documentation
 
-## I want to use a custom domain - is that possible?
+### Backend
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+The backend server handles:
+
+- Receiving video recordings
+- Extracting audio using FFmpeg
+- Transcribing audio with OpenAI Whisper
+- Analyzing transcripts with OpenAI GPT
+- Extracting key frames from the video
+- Generating structured documentation
+- Returning the completed document to the frontend
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- OpenAI for providing the AI APIs
+- Shadcn UI for the component library
+- The MediaRecorder API for making browser recording possible

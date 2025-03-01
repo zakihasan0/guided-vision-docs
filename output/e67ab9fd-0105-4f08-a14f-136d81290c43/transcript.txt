@@ -1,0 +1,8 @@
+
+    Hello everyone, today I'm going to show you how to configure system settings.
+    First, let's navigate to the Administration panel and select System Settings from the dropdown menu.
+    Now, we need to locate the Security tab and review all current settings. 
+    It's important to adjust password policies and access controls as needed for compliance.
+    Next, let's navigate to the Performance section and optimize cache settings and database connection parameters based on system load.
+    After completing these configurations, run the system diagnostics tool to verify all settings are applied correctly and monitor performance for 24 hours.
+  

@@ -1,0 +1,23 @@
+{
+  "title": "How to Take a Screen Capture",
+  "introduction": "This tutorial provides a quick guide on how to capture your screen. Screen captures are useful for sharing information, documenting issues, creating tutorials, and more.  This simple process allows you to capture exactly what you see on your screen.",
+  "steps": [
+    {
+      "title": "Initiate Screen Capture",
+      "description": "At 0.5 seconds, you will receive the instruction to take a screen capture.  This is your cue to begin the process. Be ready to initiate the capture immediately following the instruction."
+    },
+    {
+      "title": "Begin Capture Process",
+      "description": "Around 2 seconds into the tutorial, you should begin the screen capture process. The exact method for taking a screenshot will depend on your operating system and the tools available. For example, on Windows, you might use the Snipping Tool, the Print Screen key, or a dedicated screen capture application.  On macOS, you can use Command+Shift+3 (full screen), Command+Shift+4 (selected area), or Command+Shift+5 (options menu)."
+    },
+    {
+      "title": "Capture in Progress",
+      "description": "Between 2 and 5 seconds, the screen capture is in progress.  If you're using a selection tool, ensure you've captured the desired area. If using a full-screen capture method, simply wait for the process to complete."
+    },
+    {
+      "title": "Capture Complete",
+      "description": "By 5 seconds, the screen capture process should be complete. The captured image will typically be saved to your clipboard, a designated folder (e.g., Screenshots), or opened in a preview application, depending on your chosen method and settings."
+    }
+  ],
+  "conclusion": "You have successfully captured your screen! The captured image can now be pasted into other applications (if copied to the clipboard), edited, shared, or saved as needed.  Remember to review your operating system's specific instructions for more advanced screen capture options like capturing specific windows or recording video of your screen. Efficient use of screen captures can significantly enhance your productivity and communication."
+}
