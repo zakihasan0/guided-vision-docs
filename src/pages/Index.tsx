@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { DocumentList } from '@/components/DocumentList';
 import { RecordingModal } from '@/components/RecordingModal';
@@ -10,6 +9,7 @@ const Index = () => {
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const isProcessingRecording = useRef(false);
 
   // Simulated data loading
   useEffect(() => {
@@ -98,56 +98,71 @@ const Index = () => {
   const handleRecordingComplete = (blob: Blob) => {
     console.log('Recording completed, blob size:', blob.size);
     
-    // This would normally upload the recording to a server
-    // For demo purposes, we'll simulate processing and adding a new document
+    // Prevent multiple document creations
+    if (isProcessingRecording.current) {
+      console.log("Already processing a recording, ignoring duplicate call");
+      return;
+    }
     
-    const newDoc: Document = {
-      id: `doc-${Date.now()}`,
-      title: `Document ${documents.length + 1}`,
-      createdAt: new Date(),
-      status: 'processing'
-    };
+    isProcessingRecording.current = true;
     
-    setDocuments(prev => [newDoc, ...prev]);
-    
-    // Simulate processing completion
-    setTimeout(() => {
-      setDocuments(prev => prev.map(doc => 
-        doc.id === newDoc.id 
-          ? {
-            ...doc,
-            status: 'completed',
-            title: `How to Configure System Settings`,
-            content: {
-              introduction: 'This guide covers the system configuration process for administrators to optimize performance and security.',
-              steps: [
-                {
-                  id: `step-${Date.now()}-1`,
-                  title: 'Access System Settings',
-                  description: 'Navigate to the Administration panel and select "System Settings" from the dropdown menu.',
-                  imageUrl: 'https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?q=80&w=1000&auto=format&fit=crop'
-                },
-                {
-                  id: `step-${Date.now()}-2`,
-                  title: 'Update Security Parameters',
-                  description: 'Locate the Security tab and review all current settings. Adjust password policies and access controls as needed for compliance.',
-                  imageUrl: 'https://images.unsplash.com/photo-1563206767-5b18f218e8de?q=80&w=1000&auto=format&fit=crop'
-                },
-                {
-                  id: `step-${Date.now()}-3`,
-                  title: 'Configure Performance Options',
-                  description: 'Navigate to the Performance section and optimize cache settings and database connection parameters based on system load.',
-                  imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop'
-                }
-              ],
-              conclusion: 'After completing these configurations, run the system diagnostics tool to verify all settings are applied correctly and monitor performance for 24 hours.'
-            }
-          } 
-          : doc
-      ));
+    try {
+      // This would normally upload the recording to a server
+      // For demo purposes, we'll simulate processing and adding a new document
       
-      toast.success('Document processing completed');
-    }, 8000);
+      const newDoc: Document = {
+        id: `doc-${Date.now()}`,
+        title: `Document ${documents.length + 1}`,
+        createdAt: new Date(),
+        status: 'processing'
+      };
+      
+      setDocuments(prev => [newDoc, ...prev]);
+      
+      // Simulate processing completion
+      setTimeout(() => {
+        setDocuments(prev => prev.map(doc => 
+          doc.id === newDoc.id 
+            ? {
+              ...doc,
+              status: 'completed',
+              title: `How to Configure System Settings`,
+              content: {
+                introduction: 'This guide covers the system configuration process for administrators to optimize performance and security.',
+                steps: [
+                  {
+                    id: `step-${Date.now()}-1`,
+                    title: 'Access System Settings',
+                    description: 'Navigate to the Administration panel and select "System Settings" from the dropdown menu.',
+                    imageUrl: 'https://images.unsplash.com/photo-1537432376769-00f5c2f4c8d2?q=80&w=1000&auto=format&fit=crop'
+                  },
+                  {
+                    id: `step-${Date.now()}-2`,
+                    title: 'Update Security Parameters',
+                    description: 'Locate the Security tab and review all current settings. Adjust password policies and access controls as needed for compliance.',
+                    imageUrl: 'https://images.unsplash.com/photo-1563206767-5b18f218e8de?q=80&w=1000&auto=format&fit=crop'
+                  },
+                  {
+                    id: `step-${Date.now()}-3`,
+                    title: 'Configure Performance Options',
+                    description: 'Navigate to the Performance section and optimize cache settings and database connection parameters based on system load.',
+                    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop'
+                  }
+                ],
+                conclusion: 'After completing these configurations, run the system diagnostics tool to verify all settings are applied correctly and monitor performance for 24 hours.'
+              }
+            } 
+            : doc
+        ));
+        
+        toast.success('Document processing completed');
+        isProcessingRecording.current = false;
+      }, 8000);
+    } catch (error) {
+      console.error("Error processing recording:", error);
+      toast.error("Failed to process recording");
+      isProcessingRecording.current = false;
+    }
   };
 
   // Open recording modal

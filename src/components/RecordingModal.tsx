@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useScreenRecorder } from '@/hooks/useScreenRecorder';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -29,6 +30,7 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
   });
   
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasStartedRecording, setHasStartedRecording] = useState(false);
   
   // Format recording time as MM:SS
   const formattedTime = useCallback(() => {
@@ -37,16 +39,28 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }, [recordingTime]);
   
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setHasStartedRecording(false);
+      if (isRecording) {
+        stopRecording();
+      }
+    }
+  }, [isOpen, isRecording, stopRecording]);
+  
   // Handle completed recording
   useEffect(() => {
-    if (recordedBlob && !isRecording) {
-      onRecordingComplete(recordedBlob);
+    if (recordedBlob && !isRecording && hasStartedRecording) {
+      console.log("Recording completed with blob size:", recordedBlob.size);
+      setHasStartedRecording(false);
     }
-  }, [recordedBlob, isRecording, onRecordingComplete]);
+  }, [recordedBlob, isRecording, hasStartedRecording]);
   
   // Handle errors
   useEffect(() => {
     if (error) {
+      console.error("Recording error:", error);
       toast.error(error);
     }
   }, [error]);
@@ -69,9 +83,16 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
       setIsProcessing(true);
       // Simulate processing delay
       setTimeout(() => {
-        setIsProcessing(false);
-        onRecordingComplete(recordedBlob);
-        onClose();
+        try {
+          console.log("Processing recording, sending to parent component");
+          onRecordingComplete(recordedBlob);
+          setIsProcessing(false);
+          onClose();
+        } catch (e) {
+          console.error("Error processing recording:", e);
+          setIsProcessing(false);
+          toast.error("Failed to process recording. Please try again.");
+        }
       }, 2000);
     }
   }, [recordedBlob, onRecordingComplete, onClose]);
@@ -96,8 +117,20 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
   
   // Start the recording
   const handleStartRecording = useCallback(async () => {
+    console.log("Starting recording with options:", recordingOptions);
+    setHasStartedRecording(true);
     await startRecording(recordingOptions);
   }, [startRecording, recordingOptions]);
+
+  // Reset recording state to record again
+  const handleRecordAgain = useCallback(() => {
+    setRecordingOptions({
+      audio: true,
+      video: false,
+      screen: true
+    });
+    setHasStartedRecording(false);
+  }, []);
   
   return (
     <Dialog open={isOpen} onOpenChange={() => handleClose()}>
@@ -224,11 +257,7 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
                   <X size={16} className="mr-2" />
                   Cancel
                 </Button>
-                <Button variant="outline" onClick={() => setRecordingOptions({
-                  audio: true,
-                  video: false,
-                  screen: true
-                })} disabled={isProcessing}>
+                <Button variant="outline" onClick={handleRecordAgain} disabled={isProcessing}>
                   Record Again
                 </Button>
               </div>
