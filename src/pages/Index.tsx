@@ -35,7 +35,7 @@ const Index = () => {
                 {
                   id: 's2',
                   title: 'Set up email and accounts',
-                  description: 'Access the IT admin panel and provision a new email account. Then use the account creation wizard to generate logins for all required systems based on the employee's role.',
+                  description: 'Access the IT admin panel and provision a new email account. Then use the account creation wizard to generate logins for all required systems based on the employee\'s role.',
                   imageUrl: 'https://images.unsplash.com/photo-1603791239531-1dda55e194a6?q=80&w=1000&auto=format&fit=crop'
                 },
                 {
