@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useScreenRecorder } from '@/hooks/useScreenRecorder';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,8 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasStartedRecording, setHasStartedRecording] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const blobUrlRef = useRef<string | null>(null);
   
   // Format recording time as MM:SS
   const formattedTime = useCallback(() => {
@@ -46,16 +48,36 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
       if (isRecording) {
         stopRecording();
       }
+      
+      // Clean up any blob URLs when the modal closes
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
     }
   }, [isOpen, isRecording, stopRecording]);
   
-  // Handle completed recording
+  // Handle recorded blob changes
   useEffect(() => {
-    if (recordedBlob && !isRecording && hasStartedRecording) {
-      console.log("Recording completed with blob size:", recordedBlob.size);
-      setHasStartedRecording(false);
+    // Clean up previous blob URL
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
     }
-  }, [recordedBlob, isRecording, hasStartedRecording]);
+    
+    if (recordedBlob && !isRecording) {
+      console.log("Recording completed with blob size:", recordedBlob.size);
+      
+      // Create a new blob URL for the video preview
+      const blobUrl = URL.createObjectURL(recordedBlob);
+      blobUrlRef.current = blobUrl;
+      
+      // Update the video element if it exists
+      if (videoRef.current) {
+        videoRef.current.src = blobUrl;
+      }
+    }
+  }, [recordedBlob, isRecording]);
   
   // Handle errors
   useEffect(() => {
@@ -77,10 +99,15 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
     }
   }, [isRecording, stopRecording, onClose]);
   
-  // Simulate processing after completing recording
+  // Save recording and send to parent component
   const handleSaveRecording = useCallback(() => {
     if (recordedBlob) {
       setIsProcessing(true);
+      
+      // Log the blob details for debugging
+      console.log("Processing recording, mime type:", recordedBlob.type);
+      console.log("Blob size:", recordedBlob.size);
+      
       // Simulate processing delay
       setTimeout(() => {
         try {
@@ -88,6 +115,7 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
           onRecordingComplete(recordedBlob);
           setIsProcessing(false);
           onClose();
+          toast.success("Recording processed successfully");
         } catch (e) {
           console.error("Error processing recording:", e);
           setIsProcessing(false);
@@ -124,6 +152,12 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
 
   // Reset recording state to record again
   const handleRecordAgain = useCallback(() => {
+    // Clean up any blob URLs
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+    
     setRecordingOptions({
       audio: true,
       video: false,
@@ -219,10 +253,14 @@ export function RecordingModal({ isOpen, onClose, onRecordingComplete }: Recordi
           {recordedBlob && !isRecording && (
             <div className="relative overflow-hidden rounded-lg border bg-muted/30">
               <video 
-                src={URL.createObjectURL(recordedBlob)} 
+                ref={videoRef}
                 controls 
                 className="w-full h-auto"
-              />
+                autoPlay={false}
+              >
+                <source src={blobUrlRef.current || undefined} type={recordedBlob.type || 'video/webm'} />
+                Your browser does not support the video tag.
+              </video>
             </div>
           )}
         </div>

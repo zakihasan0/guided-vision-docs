@@ -67,9 +67,9 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
       if (options.screen) {
         try {
           console.log("Requesting screen access...");
+          // Fix: Remove the 'cursor' property which caused the TypeScript error
           const displayStream = await navigator.mediaDevices.getDisplayMedia({
-            video: { 
-              cursor: "always",
+            video: {
               displaySurface: "monitor"
             },
             audio: options.audio
@@ -149,15 +149,42 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
       streamRef.current = stream;
       
       // Create media recorder with explicit mime type
-      const mimeType = 'video/webm;codecs=vp9';
-      let mediaRecorder: MediaRecorder;
+      // Try different mime types for better compatibility
+      const mimeTypes = [
+        'video/webm;codecs=vp9,opus',
+        'video/webm;codecs=vp8,opus',
+        'video/webm',
+        'video/mp4'
+      ];
       
-      try {
-        mediaRecorder = new MediaRecorder(stream, { mimeType });
-        console.log("MediaRecorder created with mime type:", mimeType);
-      } catch (e) {
-        console.warn("Failed to create MediaRecorder with specified mime type, falling back to default");
-        mediaRecorder = new MediaRecorder(stream);
+      let mediaRecorder: MediaRecorder | null = null;
+      let usedMimeType = '';
+      
+      for (const mimeType of mimeTypes) {
+        if (MediaRecorder.isTypeSupported(mimeType)) {
+          try {
+            mediaRecorder = new MediaRecorder(stream, { mimeType });
+            usedMimeType = mimeType;
+            console.log("MediaRecorder created with mime type:", mimeType);
+            break;
+          } catch (e) {
+            console.warn(`Failed to create MediaRecorder with mime type ${mimeType}:`, e);
+          }
+        }
+      }
+      
+      if (!mediaRecorder) {
+        // Last resort - try without specifying mime type
+        try {
+          mediaRecorder = new MediaRecorder(stream);
+          console.log("MediaRecorder created with default mime type");
+        } catch (e) {
+          console.error("Failed to create MediaRecorder with any mime type:", e);
+          toast.error("Recording not supported in this browser");
+          resetState();
+          isProcessingRef.current = false;
+          return;
+        }
       }
       
       mediaRecorderRef.current = mediaRecorder;
@@ -173,7 +200,8 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
       mediaRecorder.onstop = () => {
         console.log("MediaRecorder stopped, chunks collected:", chunksRef.current.length);
         if (chunksRef.current.length > 0) {
-          const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+          // Use the same mime type that was used for recording
+          const blob = new Blob(chunksRef.current, { type: usedMimeType || 'video/webm' });
           console.log("Created final blob of size:", blob.size);
           setRecordedBlob(blob);
         } else {
@@ -205,8 +233,8 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
         stopRecording();
       };
       
-      // Start recording
-      mediaRecorder.start(1000); // Collect data every second
+      // Start recording with smaller data chunks for better reliability
+      mediaRecorder.start(500); // Collect data every 500ms
       console.log("MediaRecorder started");
       setIsRecording(true);
       
@@ -223,7 +251,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
       toast.error("Failed to start recording. Please check permissions and try again.");
       isProcessingRef.current = false;
     }
-  }, [resetState]);
+  }, [resetState, isRecording]);
   
   const stopRecording = useCallback(() => {
     console.log("Stopping recording, current state:", { 

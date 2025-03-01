@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { DocumentList } from '@/components/DocumentList';
@@ -82,7 +83,31 @@ const Index = () => {
             id: '3',
             title: 'Customer Support Ticket Resolution',
             createdAt: new Date(Date.now() - 3600000 * 5), // 5 hours ago
-            status: 'processing'
+            status: 'completed',
+            content: {
+              introduction: 'This guide explains the process for resolving customer support tickets efficiently.',
+              steps: [
+                {
+                  id: 's1',
+                  title: 'Triage the ticket',
+                  description: 'Review the ticket details and categorize its priority based on urgency and impact.',
+                  imageUrl: 'https://images.unsplash.com/photo-1534536281715-e28d76689b4d?q=80&w=1000&auto=format&fit=crop'
+                },
+                {
+                  id: 's2',
+                  title: 'Research the issue',
+                  description: 'Check the knowledge base and previous similar tickets for potential solutions.',
+                  imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000&auto=format&fit=crop'
+                },
+                {
+                  id: 's3',
+                  title: 'Implement solution',
+                  description: 'Contact the customer and guide them through the resolution process.',
+                  imageUrl: 'https://images.unsplash.com/photo-1560264280-88b68371db39?q=80&w=1000&auto=format&fit=crop'
+                }
+              ],
+              conclusion: 'Always follow up with customers to ensure their problem was resolved completely and to their satisfaction.'
+            }
           }
         ];
         
@@ -112,7 +137,7 @@ const Index = () => {
       
       const newDoc: Document = {
         id: `doc-${Date.now()}`,
-        title: `Document ${documents.length + 1}`,
+        title: `Processing Document...`,
         createdAt: new Date(),
         status: 'processing'
       };
