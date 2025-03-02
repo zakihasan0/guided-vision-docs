@@ -23,7 +23,7 @@ An AI-powered documentation tool that converts screen recordings (with voice exp
 
 - Node.js with Express
 - FFmpeg for audio extraction and frame capture
-- OpenAI APIs (Whisper for transcription, GPT for document generation)
+- Google Gemini API for AI features (transcription and document generation)
 - Multer for file uploads
 
 ## Getting Started
@@ -47,7 +47,14 @@ An AI-powered documentation tool that converts screen recordings (with voice exp
    npm install
    ```
 
-3. Set up environment variables:
+3. Set up server configuration:
+   - Copy `server/config.template.js` to `server/config.js`
+   - Update `GEMINI_API_KEY` in the config file with your actual Google Gemini API key
+   ```
+   cp server/config.template.js server/config.js
+   ```
+
+4. Set up environment variables:
    Create a `.env` file in the root directory with the following variables:
    ```
    OPENAI_API_KEY=your_openai_api_key

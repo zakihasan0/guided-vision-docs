@@ -34,3 +34,6 @@ dist-ssr
 # Server uploads
 server/uploads/*
 !server/uploads/.gitkeep
+
+# API Keys and Sensitive Config
+server/config.js
